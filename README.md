@@ -1,10 +1,40 @@
 # ArgoCD in Multi Cluster Environment
+🚀 I just set up ArgoCD in a Multi-Cluster Hub-Spoke architecture on AWS EKS 
+— and here's what I learned.
 
-ArgoCD is a GipOps based tool and its very popular in CD space. Traditionally the CD part is managed by scripts , python or ansible but they come with lot of drawbacks and which are addressed by ArgoCD.
+The problem with managing multiple Kubernetes clusters is configuration drift. 
+Teams make ad-hoc changes directly to clusters, and suddenly Staging and 
+Production are running different things. GitOps solves this.
 
-GitOps uses GIT as a single source of source of truth to deliver applications and infrastructure 
+Here's what I built:
 
-If your source code has a mechanism  of tracking  then why can’t your deployment have the mechanism of tracking which triggered the idea of this GitOps . If CI has a Git integrated  approach  then why can’t the CD have?
+✅ 1 Hub EKS cluster running ArgoCD
+✅ 2 Spoke EKS clusters (spoke-cluster-1 & spoke-cluster-2) as managed targets
+✅ Git as the single source of truth — what's in Git is what runs in the cluster
+
+The most important thing I learned:
+
+ArgoCD won't let the cluster override Git.
+I tested this by changing a value directly in the cluster.
+ArgoCD flagged it as "OutOfSync" immediately.
+Enable Prune → it discards the drift and resyncs from Git. Every time.
+
+That's the power of GitOps. Not just automation — enforcement.
+
+⚠️ One real mistake I made:
+Started with t3.small EC2 nodes — ran into IP allocation issues with the pods.
+Had to upscale. Always check your node capacity before deploying ArgoCD!
+
+Tech used:
+→ AWS EKS (3 clusters)
+→ ArgoCD (Hub-Spoke model)
+→ ArgoCD CLI for cluster registration
+→ Helm for app deployments
+→ IAM roles for cross-cluster permissions
+
+GitHub repo in comments 👇
+
+#DevOps #Kubernetes #ArgoCD #GitOps #AWS #EKS #CloudNative #K8s
 
 ![image.png](ArgoCD%20in%20Multi%20Cluster%20Environment/image.png)
 
